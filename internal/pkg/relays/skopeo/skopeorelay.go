@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"strconv"
 
 	"github.com/xelalexv/dregsy/internal/pkg/log"
 	"github.com/xelalexv/dregsy/internal/pkg/relays/docker"
@@ -105,8 +106,18 @@ func (r *SkopeoRelay) Sync(srcRef, srcAuth string, srcSkipTLSVerify bool,
 		}
 	}
 
+	maxTag := 0
+	for _ , v := range tags{
+		if v!="latest"{
+			number, _ := strconv.Atoi(v)
+			if maxTag<number{
+				maxTag = number
+			}
+		}
+	}
+	newTags := [2]string{strconv.Itoa(maxTag), "latest"}
 	errs := false
-	for _, tag := range tags {
+	for _, tag := range newTags {
 		log.Println()
 		log.Info("syncing tag '%s':", tag)
 		errs = errs || log.Error(
